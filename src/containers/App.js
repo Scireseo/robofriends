@@ -1,49 +1,68 @@
-import React, { Component } from 'react'
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
 import CardList from '../components/CardList';
 import SearchBox from '../components/SearchBox';
 import Scroll from '../components/Scroll';
 import ErrorBoundary from '../components/ErrorBoundary';
 import './App.css';
 
-class App extends Component {
-    constructor() {
-        super();
-        this.state = {
-            robots: [],
-            searchField: '',
+import { setSearchField, setCount, requestRobots } from '../actions';
+
+const mapStateToProps = state => {
+    return {
+        searchField: state.searchRobots.searchField,
+        count: state.setCount.count,
+        robots: state.requestRobots.robots,
+        isPending: state.requestRobots.isPending,
+        error: state.requestRobots.error,
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return { 
+        onSearchChange: (event) => dispatch(setSearchField(event.target.value)),
+        onCountButtonClick: (event) => dispatch(setCount(event)),
+        onRequestRobots: () => dispatch(requestRobots()),
+    }
+}
+
+function App(props) {
+    const { 
+        robots,
+        isPending,
+        // error,
+        onRequestRobots,
+        count, 
+        onCountButtonClick, 
+        searchField,
+        onSearchChange 
+    } = props;
+
+    //Last Video Watched: 047 Why Redux_
+
+    useEffect(() => {
+        if(!robots.length) {
+            onRequestRobots();
         }
-    }
+    }, [robots, count, onRequestRobots]);
 
-    componentDidMount() {
-        fetch(`https://jsonplaceholder.typicode.com/users`)
-            .then(response => response.json())
-            .then(users => this.setState({ robots: users }));
-    }
+    const filteredRobots = robots.filter(robot => {
+        return robot.name.toLowerCase().includes(searchField.toLowerCase());
+    })
 
-    onSearchChange = (event) => {
-        this.setState({ searchField: event.target.value });
-    }
-
-    //Last Video Watched: 22 CWD_Building A React App 3
-
-    render() {
-        const { robots, searchField } = this.state;
-        const filteredRobots = robots.filter(robot => {
-            return robot.name.toLowerCase().includes(searchField.toLowerCase());
-        })
-        return !robots.length ?
-            <h1>Loading</h1>
-        :
+    return isPending ?
+        <h1>Loading</h1>
+    :
         <div className='tc'>
             <h1 className='f1'>RoboFriends</h1>
-            <SearchBox searchChange={this.onSearchChange}/>
+            <button onClick={() => onCountButtonClick(parseInt(count+1))}>Click Me!</button>
+            <SearchBox searchChange={onSearchChange}/>
             <Scroll>
                 <ErrorBoundary>
                     <CardList robots={filteredRobots}/>
                 </ErrorBoundary>
             </Scroll>
         </div>
-    }
 }
 
-export default App
+export default connect(mapStateToProps, mapDispatchToProps)(App);
