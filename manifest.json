@@ -21,7 +21,7 @@
       "src": "/android-chrome-192x192.png",
       "sizes": "512x512",
       "type": "image/png"
-    },
+    }
   ],
   "start_url": ".",
   "display": "standalone",
