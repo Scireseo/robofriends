@@ -7,6 +7,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import './App.css';
 
 import { setSearchField, setCount, requestRobots } from '../actions';
+import Header from '../components/Header';
 
 const mapStateToProps = state => {
     return {
@@ -54,7 +55,7 @@ function App(props) {
         <h1>Loading</h1>
     :
         <div className='tc'>
-            <h1 className='f1'>RoboFriends</h1>
+            <Header/>
             <button onClick={() => onCountButtonClick(parseInt(count+1))}>Click Me!</button>
             <SearchBox searchChange={onSearchChange}/>
             <Scroll>
